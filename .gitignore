@@ -1,0 +1,15 @@
+# Allowlist: nothing is tracked unless listed here, so credentials, history,
+# sessions, memory and local settings can never be committed by accident.
+*
+!.gitignore
+!LICENSE
+!README.md
+!install.ps1
+!sync-settings.ps1
+!claude/
+!claude/CLAUDE.md
+!claude/settings.json
+!claude/hooks/
+!claude/hooks/**
+!claude/templates/
+!claude/templates/**
