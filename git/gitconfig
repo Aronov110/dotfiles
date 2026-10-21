@@ -1,0 +1,16 @@
+# Shared git settings, pulled into ~/.gitconfig via [include] by install.ps1.
+# Identity (user.name / user.email) deliberately stays in the local ~/.gitconfig
+# so it never lands in this public repo. core.excludesfile is set by the installer.
+[core]
+	autocrlf = input
+[init]
+	defaultBranch = main
+[push]
+	autoSetupRemote = true
+[fetch]
+	prune = true
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f

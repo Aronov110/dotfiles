@@ -1,0 +1,19 @@
+# Copy to .gitattributes in a new repo.
+# LF everywhere so shell scripts and Docker builds behave the same on Windows.
+* text=auto eol=lf
+
+# Windows-only scripts that need CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary files: never diff or normalize.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
+*.zip binary

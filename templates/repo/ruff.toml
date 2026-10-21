@@ -1,0 +1,15 @@
+# Copy to the root of a new Python repo. Starting point, not a mandate:
+# repos that already configure Ruff or another formatter keep their own.
+line-length = 100
+target-version = "py312"
+
+[lint]
+# E/F pycodestyle+pyflakes, I imports, B bugbear, UP pyupgrade, S bandit (security), SIM simplify, C4 comprehensions
+select = ["E", "F", "I", "B", "UP", "S", "SIM", "C4"]
+
+[lint.per-file-ignores]
+# asserts are the point of tests
+"tests/**" = ["S101"]
+
+[format]
+quote-style = "double"

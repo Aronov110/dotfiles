@@ -1,0 +1,34 @@
+# Copy to .gitignore in a new repo. OS/editor junk is covered by the global ignore file.
+
+# Dependencies and build output
+node_modules/
+dist/
+build/
+coverage/
+.next/
+.turbo/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Environment and secrets (keep the example file)
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Planning docs: uncomment for client/employer repos (plans are committed by default)
+# .plans/

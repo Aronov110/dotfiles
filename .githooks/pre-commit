@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Blocks commits that contain secrets. Enabled by install.ps1 via core.hooksPath.
+# Uses gitleaks when available; otherwise falls back to a basic pattern scan.
+# Set PRECOMMIT_NO_GITLEAKS=1 to force the fallback (used by the tests).
+set -u
+
+# 1) Never allow secret-looking files, whatever their content.
+bad_files=$(git diff --cached --name-only --diff-filter=ACM \
+  | grep -E '(^|/)(\.env(\.[^/]+)?|id_(rsa|dsa|ecdsa|ed25519)|\.token_seed|\.?credentials\.json)$|\.(pem|key|p12|pfx)$' \
+  | grep -vE '\.(example|sample|template|dist)$' || true)
+if [ -n "$bad_files" ]; then
+  echo "pre-commit: refusing to commit secret-looking files:" >&2
+  echo "$bad_files" >&2
+  exit 1
+fi
+
+find_gitleaks() {
+  [ "${PRECOMMIT_NO_GITLEAKS:-}" = "1" ] && return 1
+  command -v gitleaks 2>/dev/null && return 0
+  local base
+  base=$(cygpath -u "${LOCALAPPDATA:-}" 2>/dev/null || true)
+  if [ -n "$base" ] && [ -x "$base/Microsoft/WinGet/Links/gitleaks.exe" ]; then
+    echo "$base/Microsoft/WinGet/Links/gitleaks.exe"
+    return 0
+  fi
+  return 1
+}
+
+# 2) Content scan.
+if gitleaks_bin=$(find_gitleaks); then
+  if ! "$gitleaks_bin" git --pre-commit --staged --redact --no-banner; then
+    echo "pre-commit: gitleaks found possible secrets. Remove them (and rotate them if real) before committing." >&2
+    exit 1
+  fi
+  exit 0
+fi
+
+echo "pre-commit: gitleaks not found; using a basic pattern scan. Install gitleaks for full coverage." >&2
+patterns='-----BEGIN [A-Z ]*PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{50,}|AKIA[0-9A-Z]{16}|sk-ant-[A-Za-z0-9_-]{20,}|xox[baprs]-[A-Za-z0-9-]{10,}'
+# -e keeps a pattern that starts with "-----BEGIN" from being read as an option.
+if git diff --cached -U0 --no-color | grep -E '^\+' | grep -Ev '^\+\+\+' | grep -Eq -e "$patterns"; then
+  echo "pre-commit: staged changes match a secret pattern (private key or token). Remove it before committing." >&2
+  exit 1
+fi
+exit 0

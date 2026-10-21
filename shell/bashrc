@@ -1,0 +1,22 @@
+# Sourced from ~/.bashrc by install.ps1. Keep it small and safe: no aliases
+# for destructive commands (commit, push, reset, rm).
+
+# Tools installed outside the Windows PATH of an already-running shell.
+for dir in "$HOME/.bun/bin" "$HOME/.local/bin" "/c/Program Files/GitHub CLI"; do
+  case ":$PATH:" in
+    *":$dir:"*) ;;
+    *) [ -d "$dir" ] && PATH="$dir:$PATH" ;;
+  esac
+done
+export PATH
+
+# Read-only shortcuts.
+alias ll='ls -lah'
+alias gst='git status -sb'
+alias glg='git log --oneline --graph --decorate -15'
+alias gdf='git diff'
+
+# Prompt: user, directory and current branch (__git_ps1 ships with Git for Windows).
+if declare -F __git_ps1 >/dev/null 2>&1; then
+  PS1='\[\e[32m\]\u\[\e[0m\] \[\e[34m\]\w\[\e[33m\]$(__git_ps1 " (%s)")\[\e[0m\]\n\$ '
+fi
